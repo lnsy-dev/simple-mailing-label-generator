@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simple Mailing List Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap" rel="stylesheet">
+
+  <script src="./easy-form.js" type="module"></script>
+
+</head>
+
+<style>
+
+  pre {
+    font-family: 'Roboto', sans-serif;
+  }
+
+  mailing-label {
+    display: block;
+    width: 4in;
+    height: 6in;
+    position:relative;
+    margin: 0.5in;
+    font-size: 18pt;
+  }
+
+  mailing-label pre#sender_address {
+    font-size: 70%;
+    position: absolute;
+    right:0.25in;
+    top:0.25in;
+    transform: rotate(90deg);
+  }
+
+  mailing-label pre#target_address {
+    position:absolute;
+    right: 0.5in;
+    top: 3in;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  qr-code a {
+    display: none;
+  }
+
+  qr-code {
+    margin:0;
+    padding:0;
+  }
+
+  qr-code img {
+    width: 1.8in;
+    height: 1.8in;
+    display: block;
+  }
+
+  @media print {
+    easy-form {
+      display: none;
+    }
+  }
+</style>
+<body>
+  <easy-form id="easy_form">
+    <p>This app is for generating 4" x 6" mailing labels</p>
+    <textarea name="sender_address" id="sender_address_field">sender address</textarea>
+    <textarea name="target_address">target address</textarea>
+    <textarea name="custom_styles">
+      
+    </textarea>
+    <input type="submit">
+  </easy-form>
+  <main id="main_el">
+  </main>
+  <script>
+
+     class MailingLabel extends HTMLElement {
+      connectedCallback(){
+        this.innerHTML = `
+          <pre id="sender_address"></pre>
+          <pre id="target_address"></pre>
+        `
+      }
+    }
+    
+    customElements.define('mailing-label', MailingLabel)
+    
+    
+    
+    const sender_address_value = localStorage.getItem("sender-address." + window.location.host);
+    if(sender_address_value !== null){
+      sender_address_field.innerHTML = sender_address_value;
+    }
+  
+    easy_form.addEventListener('submit', function(e){
+      const mailing_label_el = document.createElement('mailing-label');
+      main_el.appendChild(mailing_label_el);
+      mailing_label_el.querySelector('#sender_address').innerText = e.detail.sender_address;
+      mailing_label_el.querySelector('#target_address').innerText = e.detail.target_address;
+
+        localStorage.setItem("sender-address." + window.location.host, e.detail.sender_address);
+    });
+  </script>
+</body>
+</html>
